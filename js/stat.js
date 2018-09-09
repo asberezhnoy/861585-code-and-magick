@@ -1,4 +1,4 @@
-function Player(name, time = -1) {
+function Player(name, time) {
   this.name = name;
   this.time = time;
 }
