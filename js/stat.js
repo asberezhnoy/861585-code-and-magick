@@ -34,7 +34,7 @@ var barGraphSettings = {
     },
     font: new Font('PT Mono', 16),
   },
-  barGraph: {
+  graph: {
     offset: {
       x: 30,
       y: 70
@@ -92,12 +92,12 @@ function BarGraph(settings) {
   function drawForPlayer(ctx, player, height, x, y) {
     ctx.fillStyle = 'black';
     ctx.textBaseLine = 'bottom';
-    ctx.font = settings.barGraph.font.toString();
-    ctx.fillText(player.time, x, y + settings.barGraph.height - height - settings.barGraph.font.size - 10);
-    ctx.fillText(player.name, x, y + settings.barGraph.height);
+    ctx.font = settings.graph.font.toString();
+    ctx.fillText(player.time, x, y + settings.graph.height - height - settings.graph.font.size - 10);
+    ctx.fillText(player.name, x, y + settings.graph.height);
 
-    ctx.fillStyle = player.name === settings.name ? settings.barGraph.myColumnColor() : settings.barGraph.otherColumnColor();
-    ctx.fillRect(x, y + settings.barGraph.height - height - settings.barGraph.font.size - 5, settings.barGraph.columnWidth, height);
+    ctx.fillStyle = player.name === settings.name ? settings.graph.myColumnColor() : settings.graph.otherColumnColor();
+    ctx.fillRect(x, y + settings.graph.height - height - settings.graph.font.size - 5, settings.graph.columnWidth, height);
   }
 
   this.draw = function (ctx, players) {
@@ -105,13 +105,13 @@ function BarGraph(settings) {
     drawHeader(ctx);
 
     var bestPlayer = getBestResult(players);
-    var columnMaxHeigth = settings.barGraph.height - 2 * settings.barGraph.font.size;
+    var columnMaxHeigth = settings.graph.height - 2 * settings.graph.font.size;
     var countPixelForSecond = columnMaxHeigth / bestPlayer.time;
 
     for (var i = 0; i < players.length; i++) {
       var height = Math.round(players[i].time * countPixelForSecond);
-      var x = settings.left + settings.barGraph.offset.x + i * (settings.barGraph.columnWidth + settings.barGraph.distanceBetweenColumns);
-      var y = settings.top + settings.barGraph.offset.y;
+      var x = settings.left + settings.graph.offset.x + i * (settings.graph.columnWidth + settings.graph.distanceBetweenColumns);
+      var y = settings.top + settings.graph.offset.y;
       drawForPlayer(ctx, players[i], height, x, y);
     }
   };
