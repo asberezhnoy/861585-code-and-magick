@@ -1,5 +1,7 @@
 'use strict';
 
+var PLAYER_NAME = 'Вы';
+
 function Player(name, time) {
   this.name = name;
   this.time = time;
@@ -14,116 +16,132 @@ function Font(name, size) {
   };
 }
 
-var barGraphSettings = {
-  name: 'Вы',
-  left: 100,
-  top: 10,
-  width: 420,
-  height: 270,
-  backgoundColor: 'white',
-  shadow: {
-    backgoundColor: 'rgba(0, 0, 0, 1)',
-    rightOffset: 10,
-    bottomOffset: 10
-  },
-  header: {
-    text: ['Ура вы победили!', 'Список результатов:'],
-    offset: {
-      x: 20,
-      y: 30
-    },
-    font: new Font('PT Mono', 16),
-  },
-  graph: {
-    offset: {
-      x: 30,
-      y: 70
-    },
-    font: new Font('PT Mono', 16),
-    height: 150,
-    columnWidth: 40,
-    distanceBetweenColumns: 50,
-    myColumnColor: function () {
-      return 'red';
-    },
-    otherColumnColor: function () {
-      var transparency = Math.random();
-      if ((transparency - 0.01) < 0) {
-        transparency = 0.01;
-      }
+function Coord(left, top, width, height) {
+  this.left = left;
+  this.top = top;
+  this.width = width;
+  this.height = height;
 
-      return 'rgba(0, 0, 255, ' + Math.random() + ')';
-    }
-  }
-};
+  this.add = function (addLeft, addTop, addWidth, addHeight) {
+    return new Coord(this.left + addLeft, this.top + addTop, this.width + addWidth, this.height + addHeight);
+  };
+}
 
-function BarGraph(settings) {
-  function drawCloud(ctx) {
-    ctx.fillStyle = settings.shadow.backgoundColor;
-    ctx.fillRect(settings.left + settings.shadow.rightOffset, settings.top + settings.shadow.bottomOffset, settings.width, settings.height);
-    ctx.fillStyle = settings.backgoundColor;
-    ctx.fillRect(settings.left, settings.top, settings.width, settings.height);
-  }
+function DrawingWarpper(ctx) {
+  this.drawRectangle = function (coord, backgoundColor) {
+    ctx.fillStyle = backgoundColor;
+    ctx.fillRect(coord.left, coord.top, coord.width, coord.height);
+  };
 
-  function drawHeader(ctx) {
+  this.drawText = function (text, coord, font) {
     ctx.fillStyle = 'black';
-    ctx.font = settings.header.font.toString();
+    ctx.font = font.toString();
 
-    var left = settings.left + settings.header.offset.x;
-    var top = settings.top + settings.header.offset.y;
-
-    for (var i = 0; i < settings.header.text.length; i++) {
-      ctx.fillText(settings.header.text[i], left, top);
-      top += settings.header.font.size;
-    }
-  }
-
-  function getBestResult(players) {
-    var bestPlayer = players[0];
-
-    for (var i = 1; i < players.length; i++) {
-      if (players[i].time > bestPlayer.time) {
-        bestPlayer = players[i];
+    if (Array.isArray(text)) {
+      for (var i = 0; i < text.length; i++) {
+        ctx.fillText(text[i], coord.left, coord.top + i * font.size);
       }
-    }
-    return bestPlayer;
-  }
-
-  function drawForPlayer(ctx, player, height, x, y) {
-    ctx.fillStyle = 'black';
-    ctx.textBaseLine = 'bottom';
-    ctx.font = settings.graph.font.toString();
-    ctx.fillText(player.time, x, y + settings.graph.height - height - settings.graph.font.size - 10);
-    ctx.fillText(player.name, x, y + settings.graph.height);
-
-    ctx.fillStyle = player.name === settings.name ? settings.graph.myColumnColor() : settings.graph.otherColumnColor();
-    ctx.fillRect(x, y + settings.graph.height - height - settings.graph.font.size - 5, settings.graph.columnWidth, height);
-  }
-
-  this.draw = function (ctx, players) {
-    drawCloud(ctx);
-    drawHeader(ctx);
-
-    var bestPlayer = getBestResult(players);
-    var columnMaxHeigth = settings.graph.height - 2 * settings.graph.font.size;
-    var countPixelForSecond = columnMaxHeigth / bestPlayer.time;
-
-    for (var i = 0; i < players.length; i++) {
-      var height = Math.round(players[i].time * countPixelForSecond);
-      var x = settings.left + settings.graph.offset.x + i * (settings.graph.columnWidth + settings.graph.distanceBetweenColumns);
-      var y = settings.top + settings.graph.offset.y;
-      drawForPlayer(ctx, players[i], height, x, y);
+    } else {
+      ctx.fillText(text, coord.left, coord.top);
     }
   };
 }
 
-window.renderStatistics = function (ctx, names, times) {
-  var players = [];
+function BarGrap() {
+  this.columnWidth = 40;
+  this.distanceBetweenColumns = 50;
 
-  for (var i = 0; i < names.length; i++) {
-    players.push(new Player(names[i], Math.round(times[i])));
+  this.draw = function (drawingWarpper, players, coord) {
+    for (var i = 0; i < players.length; i++) {
+      var columnCoord = new Coord(coord.left + i * (this.columnWidth + this.distanceBetweenColumns), coord.top, this.columnWidth, coord.height);
+      var column = new BarGraphColumn();
+      column.draw(drawingWarpper, players[i], columnCoord);
+    }
+  };
+}
+
+function BarGraphColumn() {
+  var _drawingWarpper = null;
+  var _coord = null;
+  var _player = null;
+  var _rectangleHeight = null;
+  var _rectanglePadding = 5;
+  var _topTitleCoord = null;
+  var _bottomTitleCoord = null;
+  var _rectangleCoord = null;
+
+  this.draw = function (drawingWarpper, player, coord) {
+    _drawingWarpper = drawingWarpper;
+    _coord = coord;
+    _player = player;
+
+    init();
+
+    drawTopTitle();
+    drawBottomTitle();
+    drwaRectangle();
+  };
+
+  function init() {
+    _rectangleHeight = Math.round(_player.time * BarGraphColumn.countPixrlsForTimeUnit);
+    _topTitleCoord = new Coord(_coord.left, _coord.top + _coord.height - _rectangleHeight - BarGraphColumn.titleFont.size - 2 * _rectanglePadding);
+    _rectangleCoord = new Coord(_coord.left, _topTitleCoord.top + _rectanglePadding, _coord.width, _rectangleHeight);
+    _bottomTitleCoord = new Coord(_coord.left, _rectangleCoord.top + _rectangleCoord.height + BarGraphColumn.titleFont.size + _rectanglePadding, _coord.width, _rectangleHeight);
   }
 
-  var barGraph = new BarGraph(barGraphSettings);
-  barGraph.draw(ctx, players);
+  function drawTopTitle() {
+    _drawingWarpper.drawText(_player.time, _topTitleCoord, BarGraphColumn.titleFont);
+  }
+
+  function drawBottomTitle() {
+    _drawingWarpper.drawText(_player.name, _bottomTitleCoord, BarGraphColumn.titleFont);
+  }
+
+  function drwaRectangle() {
+    var color = _player.name === PLAYER_NAME ? BarGraphColumn.myColumnColor() : BarGraphColumn.otherColumnColor();
+    _drawingWarpper.drawRectangle(_rectangleCoord, color);
+  }
+}
+
+BarGraphColumn.titleFont = new Font('PT Mono', 16);
+BarGraphColumn.countPixrlsForTimeUnit = null;
+BarGraphColumn.myColumnColor = function () {
+  return 'red';
+};
+BarGraphColumn.otherColumnColor = function () {
+  var transparency = Math.random();
+  if ((transparency - 0.01) < 0) {
+    transparency = 0.01;
+  }
+  return 'rgba(0, 0, 255, ' + Math.random() + ')';
+};
+
+BarGraphColumn.getCountPixrlsForTimeUnit = function (barGraphHeight, bestPlayer) {
+  var columnMaxHeigth = barGraphHeight - 2 * BarGraphColumn.titleFont.size;
+  return columnMaxHeigth / bestPlayer.time;
+};
+
+
+window.renderStatistics = function (ctx, names, times) {
+  var players = [];
+  var bestPlayer = null;
+
+  for (var i = 0; i < names.length; i++) {
+    var player = new Player(names[i], Math.round(times[i]));
+    players.push(player);
+    if (bestPlayer === null || player.time > bestPlayer.time) {
+      bestPlayer = player;
+    }
+  }
+
+  var workPlaceCoor = new Coord(100, 0, 410, 270);
+
+  var drawingWrapper = new DrawingWarpper(ctx);
+  drawingWrapper.drawRectangle(workPlaceCoor.add(10, 10, 0, 0), 'rgba(0, 0, 0, 0.8)');
+  drawingWrapper.drawRectangle(workPlaceCoor, 'white');
+  drawingWrapper.drawText(['Ура вы победили!', 'Список результатов:'], workPlaceCoor.add(20, 40, 0, 0), new Font('PT Mono', 16));
+  var barGraphCoord = workPlaceCoor.add(35, 90, -10, -120);
+  BarGraphColumn.countPixrlsForTimeUnit = BarGraphColumn.getCountPixrlsForTimeUnit(barGraphCoord.height, bestPlayer);
+  var barGraph = new BarGrap();
+  barGraph.draw(drawingWrapper, players, barGraphCoord);
 };
