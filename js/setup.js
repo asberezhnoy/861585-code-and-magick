@@ -21,8 +21,9 @@ HtmlElement.visible = function (element) {
 function Utils() {
 }
 
-Utils.getRandomNumber = function (max) {
-  return Math.floor(Math.random() * (max + 1));
+Utils.getRandomNumber = function(max, min, handler) {
+  var value = min ? Math.random() * (max + 1 - min)  + min : Math.random() * (max + 1);
+  return handler ? handler(value) : value;
 };
 
 function Wizard() {
@@ -39,9 +40,9 @@ function MockWizardFactory() {
 
   this.create = function () {
     var wizard = new Wizard();
-    wizard.name = names[Utils.getRandomNumber(names.length - 1)] + ' ' + surnames[Utils.getRandomNumber(surnames.length - 1)];
-    wizard.coatColor = coatColors[Utils.getRandomNumber(coatColors.length - 1)];
-    wizard.eyesColor = eyesColors[Utils.getRandomNumber(eyesColors.length - 1)];
+    wizard.name = names[Utils.getRandomNumber(names.length - 1, 0, Math.floor)] + ' ' + surnames[Utils.getRandomNumber(surnames.length - 1, 0, Math.floor)];
+    wizard.coatColor = coatColors[Utils.getRandomNumber(coatColors.length - 1, 0, Math.floor)];
+    wizard.eyesColor = eyesColors[Utils.getRandomNumber(eyesColors.length - 1, 0, Math.floor)];
 
     return wizard;
   };
