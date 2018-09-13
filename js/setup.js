@@ -18,13 +18,20 @@ HtmlElement.visible = function (element) {
   element.classList.remove('hidden');
 };
 
+function Utils() {
+}
+
+Utils.getRandomNumber = function (max) {
+  return Math.floor(Math.random() * (max + 1));
+};
+
 function Wizard() {
   this.name = null;
   this.coatColor = null;
   this.eyesColor = null;
 }
 
-function WizardFactory() {
+function MockWizardFactory() {
   var names = ['Иван', 'Хуан Себастьян', 'Мария', 'Кристоф', 'Виктор', 'Юлия', 'Люпита', 'Вашингтон'];
   var surnames = ['да Марья', 'Верон', 'Мирабелла', 'Вальц', 'Онопко', 'Топольницкая', 'Нионго', 'Ирвинг'];
   var coatColors = ['rgb(101, 137, 164)', 'rgb(241, 43, 107)', 'rgb(146, 100, 161)', 'rgb(56, 159, 117)', 'rgb(215, 210, 55)', 'rgb(0, 0, 0)'];
@@ -32,16 +39,12 @@ function WizardFactory() {
 
   this.create = function () {
     var wizard = new Wizard();
-    wizard.name = names[getRandomNumber(names.length - 1)] + ' ' + surnames[getRandomNumber(surnames.length - 1)];
-    wizard.coatColor = coatColors[getRandomNumber(coatColors.length - 1)];
-    wizard.eyesColor = eyesColors[getRandomNumber(eyesColors.length - 1)];
+    wizard.name = names[Utils.getRandomNumber(names.length - 1)] + ' ' + surnames[Utils.getRandomNumber(surnames.length - 1)];
+    wizard.coatColor = coatColors[Utils.getRandomNumber(coatColors.length - 1)];
+    wizard.eyesColor = eyesColors[Utils.getRandomNumber(eyesColors.length - 1)];
 
     return wizard;
   };
-
-  function getRandomNumber(max) {
-    return Math.floor(Math.random() * (max + 1));
-  }
 }
 
 function WizardListBuilder() {
@@ -66,7 +69,7 @@ function WizardListBuilder() {
 }
 
 function createMockWizards() {
-  var wizardFactory = new WizardFactory();
+  var wizardFactory = new MockWizardFactory();
   var buffer = [];
 
   for (var i = 0; i < 4; i++) {
