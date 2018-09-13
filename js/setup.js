@@ -21,8 +21,8 @@ HtmlElement.visible = function (element) {
 function Utils() {
 }
 
-Utils.getRandomNumber = function(max, min, handler) {
-  var value = min ? Math.random() * (max + 1 - min)  + min : Math.random() * (max + 1);
+Utils.getRandomNumber = function (max, min, handler) {
+  var value = min ? Math.random() * (max + 1 - min) + min : Math.random() * (max + 1);
   return handler ? handler(value) : value;
 };
 
