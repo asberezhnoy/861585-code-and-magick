@@ -1,23 +1,29 @@
 'use strict';
 
-function Query() {
+
+/* ************************   Elements   ***************************** */
+function Elements() {
 }
 
-Query.querySelector = function (text, parent) {
-  var element = parent ? parent.querySelector(text) : document.querySelector(text);
+Elements.find = function (selector, parent) {
+  var element = parent ? parent.querySelector(selector) : document.querySelector(selector);
   if (element) {
     return element;
   }
-  throw new TypeError('Не найден элемент [' + text + ']');
+  throw new TypeError('Не найден элемент [' + selector + ']');
 };
 
-function HtmlElement() {
-}
-
-HtmlElement.visible = function (element) {
-  element.classList.remove('hidden');
+Elements.visible = function (element /* селектор или Element */, parent) {
+  Elements.removeClass(element, 'hidden', parent);
 };
 
+Elements.removeClass = function (element /* селектор или Element */, className, parent) {
+  var el = typeof (element) === 'string' ? Elements.find(element, parent) : element;
+  el.classList.remove(className);
+};
+/* *********************************************************************** */
+
+/* ************************   Utils   ***************************** */
 function Utils() {
 }
 
@@ -25,6 +31,12 @@ Utils.getRandomNumber = function (max, min, handler) {
   var value = min ? Math.random() * (max + 1 - min) + min : Math.random() * (max + 1);
   return handler ? handler(value) : value;
 };
+
+Utils.getRandomArrayIndex = function (length) {
+  return Utils.getRandomNumber(length - 1, 0, Math.floor);
+};
+
+/* *********************************************************************** */
 
 function Wizard() {
   this.name = null;
@@ -40,9 +52,9 @@ function MockWizardFactory() {
 
   this.create = function () {
     var wizard = new Wizard();
-    wizard.name = names[Utils.getRandomNumber(names.length - 1, 0, Math.floor)] + ' ' + surnames[Utils.getRandomNumber(surnames.length - 1, 0, Math.floor)];
-    wizard.coatColor = coatColors[Utils.getRandomNumber(coatColors.length - 1, 0, Math.floor)];
-    wizard.eyesColor = eyesColors[Utils.getRandomNumber(eyesColors.length - 1, 0, Math.floor)];
+    wizard.name = names[Utils.getRandomArrayIndex(names.length)] + ' ' + surnames[Utils.getRandomArrayIndex(surnames.length)];
+    wizard.coatColor = coatColors[Utils.getRandomArrayIndex(coatColors.length)];
+    wizard.eyesColor = eyesColors[Utils.getRandomArrayIndex(eyesColors.length)];
 
     return wizard;
   };
@@ -50,7 +62,7 @@ function MockWizardFactory() {
 
 function WizardListBuilder() {
   var _result = null;
-  var _templateElement = Query.querySelector('.setup-similar-item', Query.querySelector('#similar-wizard-template').content);
+  var _templateElement = Elements.find('.setup-similar-item', Elements.find('#similar-wizard-template').content);
 
   this.start = function () {
     _result = document.createDocumentFragment();
@@ -58,9 +70,9 @@ function WizardListBuilder() {
 
   this.add = function (wizard) {
     var element = _templateElement.cloneNode(true);
-    Query.querySelector('.setup-similar-label', element).textContent = wizard.name;
-    Query.querySelector('.wizard-coat', element).style.fill = wizard.coatColor;
-    Query.querySelector('.wizard-eyes', element).style.fill = wizard.eyesColor;
+    Elements.find('.setup-similar-label', element).textContent = wizard.name;
+    Elements.find('.wizard-coat', element).style.fill = wizard.coatColor;
+    Elements.find('.wizard-eyes', element).style.fill = wizard.eyesColor;
     _result.appendChild(element);
   };
 
@@ -87,10 +99,9 @@ function showWizards(wizards) {
     wizardListBuilder.add(value);
   });
 
-  Query.querySelector('.setup-similar-list').appendChild(wizardListBuilder.getResult());
-  HtmlElement.visible(Query.querySelector('.setup'));
-  HtmlElement.visible(Query.querySelector('.setup-similar'));
+  Elements.find('.setup-similar-list').appendChild(wizardListBuilder.getResult());
+  Elements.visible('.setup');
+  Elements.visible('.setup-similar');
 }
 
 showWizards(createMockWizards());
-
