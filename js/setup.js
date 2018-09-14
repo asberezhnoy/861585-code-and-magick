@@ -1,6 +1,5 @@
 'use strict';
 
-
 /* ************************   Elements   ***************************** */
 function Elements() {
 }
@@ -21,6 +20,7 @@ Elements.removeClass = function (element /* селектор или Element */, 
   var el = typeof (element) === 'string' ? Elements.find(element, parent) : element;
   el.classList.remove(className);
 };
+
 /* *********************************************************************** */
 
 /* ************************   Utils   ***************************** */
