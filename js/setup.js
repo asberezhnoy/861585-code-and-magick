@@ -216,7 +216,7 @@ function Setup() {
   function onWizardEyesClick(evt) {
     var index = Utils.getRandomArrayIndex(_wizardEyesColors.length);
 
-    if (_wizardEyesColorEl.valuel === _wizardEyesColors[index]) {
+    if (_wizardEyesColorEl.value === _wizardEyesColors[index]) {
       index = (index === (_wizardEyesColors.length - 1)) ? 0 : index + 1;
     }
     _wizardEyesColorEl.value = evt.target.style.fill = _wizardEyesColors[index];
