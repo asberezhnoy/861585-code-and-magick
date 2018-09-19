@@ -128,10 +128,14 @@ function WizardListBuilder() {
   }
 }
 
-function Setup() {
-  var KEYCODE_ESC = 27;
-  var KEYCODE_ENTER = 13;
+function KeyCodes() {
+  throw new Error('Нельзя создавать экземпляр данного класса');
+}
 
+KeyCodes.ESC = 27;
+KeyCodes.ENTER = 13;
+
+function Setup() {
   var _wizardCoatColors = ['rgb(101, 137, 164)', 'rgb(241, 43, 107)', 'rgb(146, 100, 161)', 'rgb(56, 159, 117)', 'rgb(215, 210, 55)', 'rgb(0, 0, 0)'];
   var _wizardEyesColors = ['black', ' red', ' blue', 'yellow', 'green'];
   var _wizardFireballColors = ['#ee4830', ' #30a8ee', '#5ce6c0', '#e848d5', '#e6e848'];
@@ -139,10 +143,11 @@ function Setup() {
   var _root = document.querySelector('.setup');
   var _userNameEl = _root.querySelector('.setup-user-name');
   var _closeEl = _root.querySelector('.setup-close');
-  var _wizardappearanceEl = Elements.find('.setup-wizard-appearance', '.setup-player');
+  var _setupPlayerEl = _root.querySelector('.setup-player');
+  var _wizardappearanceEl = _setupPlayerEl.querySelector('.setup-wizard-appearance');
   var _wizardCoatColorEl = _wizardappearanceEl.querySelectorAll('input')[0];
   var _wizardEyesColorEl = _wizardappearanceEl.querySelectorAll('input')[1];
-  var _wizardFireballEl = Elements.find('.setup-fireball-wrap', '.setup-player').querySelector('input');
+  var _wizardFireballEl = _setupPlayerEl.querySelector('.setup-fireball-wrap').querySelector('input');
 
   init();
 
@@ -186,20 +191,20 @@ function Setup() {
   }
 
   function onUserNameKeyDown(evt) {
-    if (evt.keyCode === KEYCODE_ESC) {
+    if (evt.keyCode === KeyCodes.ESC) {
       evt.stopPropagation();
     }
   }
 
   function onSetupCloseKeyDown(evt) {
-    if (evt.keyCode === KEYCODE_ENTER) {
+    if (evt.keyCode === KeyCodes.ENTER) {
       onCloseClick(evt);
     }
     evt.stopPropagation();
   }
 
   function onDocumentKeyDown(evt) {
-    if (evt.keyCode === KEYCODE_ESC) {
+    if (evt.keyCode === KeyCodes.ESC) {
       onCloseClick(evt);
     }
   }
@@ -261,11 +266,14 @@ var setup = new Setup();
 setup.setServerUrl('https://js.dump.academy/code-and-magick');
 setup.addSimilarWizards(createMockWizards());
 
-document.querySelector('.setup-open').querySelector('img').tabIndex = 0;
-document.querySelector('.setup-open').addEventListener('keydown', function () {
-  setup.show();
+var setupOpenEl = document.querySelector('.setup-open');
+setupOpenEl.querySelector('img').tabIndex = 0;
+setupOpenEl.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === KeyCodes.ENTER) {
+    setup.show();
+  }
 });
-document.querySelector('.setup-open').addEventListener('click', function () {
+setupOpenEl.addEventListener('click', function () {
   setup.show();
 });
 
