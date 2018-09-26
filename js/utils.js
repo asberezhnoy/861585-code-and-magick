@@ -12,8 +12,14 @@
     return handler ? handler(value) : value;
   };
 
-  Random.getRandomArrayIndex = function (length) {
-    return Random.getRandomNumber(length - 1, 0, Math.floor);
+  Random.getArrayRandomItem = function (array, prevFoundItem) {
+    var index = Random.getRandomNumber(array.length - 1, 0, Math.floor);
+    var item = array[index];
+    if (item === prevFoundItem) {
+      index = (index === (array.length - 1)) ? 0 : index + 1;
+      item = array[index];
+    }
+    return item;
   };
 
 
