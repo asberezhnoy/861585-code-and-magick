@@ -43,7 +43,9 @@
     var _wizardCoatColorEl = _wizardappearanceEl.querySelectorAll('input')[0];
     var _wizardEyesColorEl = _wizardappearanceEl.querySelectorAll('input')[1];
     var _wizardFireballEl = _setupPlayerEl.querySelector('.setup-fireball-wrap').querySelector('input');
-    var _userPicEl = _root.querySelector('.setup-user-pic');
+    var _setupUserUploadEl = _root.querySelector('.setup-title').querySelector('.setup-user').querySelector('.upload');
+    var _userPicEl = _setupUserUploadEl.querySelector('.setup-user-pic');
+    var _avatarEl = _setupUserUploadEl.querySelector('input');
 
     var _clientRect = null;
     var _isDrag = false;
@@ -117,30 +119,15 @@
     }
 
     function onWizardCoatClick(evt) {
-      var index = Random.getRandomArrayIndex(_wizardCoatColors.length);
-
-      if (_wizardCoatColorEl.value === _wizardCoatColors[index]) {
-        index = (index === (_wizardCoatColors.length - 1)) ? 0 : index + 1;
-      }
-      _wizardCoatColorEl.value = evt.target.style.fill = _wizardCoatColors[index];
+      _wizardCoatColorEl.value = evt.target.style.fill = Random.getArrayRandomItem(_wizardCoatColors, _wizardCoatColorEl.value);
     }
 
     function onWizardEyesClick(evt) {
-      var index = Random.getRandomArrayIndex(_wizardEyesColors.length);
-
-      if (_wizardEyesColorEl.value === _wizardEyesColors[index]) {
-        index = (index === (_wizardEyesColors.length - 1)) ? 0 : index + 1;
-      }
-      _wizardEyesColorEl.value = evt.target.style.fill = _wizardEyesColors[index];
+      _wizardEyesColorEl.value = evt.target.style.fill = Random.getArrayRandomItem(_wizardEyesColors, _wizardEyesColorEl.value);
     }
 
     function onWizardFireballClick(evt) {
-      var index = Random.getRandomArrayIndex(_wizardFireballColors.length);
-
-      if (_wizardFireballEl.value === _wizardFireballColors[index]) {
-        index = (index === (_wizardFireballColors.length - 1)) ? 0 : index + 1;
-      }
-      _wizardFireballEl.value = evt.currentTarget.style.background = _wizardFireballColors[index];
+      _wizardFireballEl.value = evt.currentTarget.style.background = Random.getArrayRandomItem(_wizardFireballColors, _wizardFireballEl.value);
     }
 
     function onUserPicClick(evt) {
@@ -164,11 +151,11 @@
     }
 
     function onUserPicMouseDown(evt) {
-      _isDrag = false;
-      _startMouseCoord = new Point(evt.clientX, evt.clientY);
-
       document.addEventListener('mousemove', onUserPicMouseMove);
       document.addEventListener('mouseup', onUserPicMouseUp);
+
+      _isDrag = false;
+      _startMouseCoord = new Point(evt.clientX, evt.clientY);
     }
 
     function onUserPicMouseMove(evt) {
@@ -204,9 +191,8 @@
       _wizardFireballEl.parentElement.addEventListener('click', onWizardFireballClick);
       _userPicEl.addEventListener('mousedown', onUserPicMouseDown);
       _userPicEl.addEventListener('click', onUserPicClick);
-      var inp = _root.querySelector('.setup-title').querySelector('.setup-user').querySelector('.upload').querySelector('input');
-      inp.addEventListener('mousedown', onUserPicMouseDown);
-      inp.addEventListener('click', onUserPicClick);
+      _avatarEl.addEventListener('mousedown', onUserPicMouseDown);
+      _avatarEl.addEventListener('click', onUserPicClick);
 
       _userNameEl.maxLength = 25;
       _userNameEl.minLength = 2;
