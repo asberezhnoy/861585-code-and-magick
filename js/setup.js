@@ -16,9 +16,9 @@ function MockWizardFactory() {
 
   this.create = function () {
     var wizard = new Wizard();
-    wizard.name = names[Random.getRandomArrayIndex(names.length)] + ' ' + surnames[Random.getRandomArrayIndex(surnames.length)];
-    wizard.coatColor = coatColors[Random.getRandomArrayIndex(coatColors.length)];
-    wizard.eyesColor = eyesColors[Random.getRandomArrayIndex(eyesColors.length)];
+    wizard.name = Random.getArrayRandomItem(names) + ' ' + Random.getArrayRandomItem(surnames);
+    wizard.coatColor = Random.getArrayRandomItem(coatColors);
+    wizard.eyesColor = Random.getArrayRandomItem(eyesColors);
 
     return wizard;
   };
